@@ -4,6 +4,7 @@ from pygments.lexers.lisp import CommonLispLexer
 from pygments.styles import get_style_by_name
 from pygments.token import Token
 from prompt_toolkit import prompt, PromptSession
+from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import print_formatted_text, HTML
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.lexers import PygmentsLexer
@@ -23,9 +24,15 @@ text = [
 
 print_formatted_text(PygmentsTokens(text))
 
-
+def bottom_toolbar():
+    return HTML('<b>uLisp Monitor</b>')
+    
 style = style_from_pygments_cls(get_style_by_name('native'))
+lisp_completer = WordCompleter(['defvar', 'defun', 'bye', 'pprintall'])
 session = PromptSession('Enter Lisp: ', lexer=PygmentsLexer(CommonLispLexer), style=style,
+                        completer=lisp_completer, complete_while_typing=False,
+                        bottom_toolbar=bottom_toolbar,
+                        vi_mode=True, wrap_lines=False,
                         include_default_pygments_style=False)
 answer = ''
 
