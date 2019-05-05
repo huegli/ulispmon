@@ -11,16 +11,13 @@ from asyncio import gather, get_event_loop, sleep
 
 import serial
 
-ser = serial.Serial('/dev/ttyS1')
+ser = serial.Serial('/dev/ttyACM1')
 
 buffer2 = Buffer(read_only=False)  # Read-only buffer
-buffer2.insert_text('Hello World\n')
 
 def enter_cmd(cmd):
     ser.write(cmd.document.text.encode())
-    buffer2.insert_text('I wrote: ->')
-    buffer2.insert_text(cmd.document.text)
-    buffer2.insert_text('<-\n')
+    # buffer2.insert_text(cmd.document.text)
     return False
 
 buffer1 = Buffer(multiline=False, accept_handler=enter_cmd)  # Editable buffer.
