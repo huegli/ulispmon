@@ -2,17 +2,27 @@
 
 from prompt_toolkit import Application
 from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.layout.containers import HSplit, Window
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.eventloop import use_asyncio_event_loop
+from prompt_toolkit.styles.pygments import style_from_pygments_cls
+
+from pygments.lexers.lisp import CommonLispLexer
+from pygments.styles import get_style_by_name
+from pygments.token import Token
+import pygments
+
 from asyncio import gather, get_event_loop, sleep
 
 import re
 import serial
 
 ser = serial.Serial('/dev/ttyACM1')
+
+style = style_from_pygments_cls(get_style_by_name('native'))
 
 buffer2 = Buffer(read_only=False)  # Read-only buffer
 
@@ -35,7 +45,7 @@ root_container = HSplit([
 
     # One window that holds the BufferControl with the default buffer on
     # the left.
-    Window(content=BufferControl(buffer=buffer2)),
+    Window(content=BufferControl(buffer=buffer2, lexer=PygmentsLexer(CommonLispLexer))),
 
 
 ])
@@ -68,7 +78,8 @@ async def print_serial():
         else:
             await sleep(0.5)
 
-app = Application(key_bindings=kb, layout=layout, full_screen=True)
+
+app = Application(key_bindings=kb, layout=layout, style=style, full_screen=True)
 use_asyncio_event_loop()
 get_event_loop().run_until_complete(gather(
     app.run_async().to_asyncio_future(),
