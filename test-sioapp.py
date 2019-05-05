@@ -9,6 +9,7 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.eventloop import use_asyncio_event_loop
 from asyncio import gather, get_event_loop, sleep
 
+import re
 import serial
 
 ser = serial.Serial('/dev/ttyACM1')
@@ -43,28 +44,27 @@ layout = Layout(root_container)
 
 kb = KeyBindings()
 
+RunApp = True
+
 @kb.add('c-q')
 def exit_(event):
+    global RunApp
     """
     Pressing Ctrl-Q will exit the user interface.
 
     Setting a return value means: quit the event loop that drives the user
     interface and return this value from the `Application.run()` call.
     """
+    RunApp = False
     event.app.exit()
-
-async def print_hello():
-    for _ in range(100):
-        buffer2.insert_text('Hello World\n')
-        await sleep(0.5)
-
+    
 
 async def print_serial():
-    while True:
+    while (RunApp):
         if (ser.inWaiting() > 0):
-            ch_str = ser.read().decode()
-            if (ch_str != '\r'):
-                buffer2.insert_text(ch_str)
+            input_str = ser.read(ser.inWaiting()).decode()
+            clean_str = re.sub('\r','', input_str)
+            buffer2.insert_text(clean_str)
         else:
             await sleep(0.5)
 
